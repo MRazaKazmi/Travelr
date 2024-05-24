@@ -1,6 +1,5 @@
 // js files
 import { handleSubmit } from './js/app'
-import { getCityData } from './js/geonames'
 
 // sass files
 import './styles/index.scss'
