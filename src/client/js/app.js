@@ -43,6 +43,18 @@ const getImage = async (city) => {
       console.log('error', error);
   }}
 
+const getHotels = async (city) => {
+  const response = await fetch(`http://localhost:8000/api/hotels?city=${city}`);
+
+  try {
+    //Transform into JSON
+    const data = await response.json();
+    return data.businesses;
+  }
+  catch (error) {
+      console.log('error', error);
+  }}
+
 const getRestaurants = async (city) => {
   const response = await fetch(`http://localhost:8000/api/restaurants?city=${city}`);
 
@@ -55,19 +67,25 @@ const getRestaurants = async (city) => {
       console.log('error', error);
   }}
 
-
 const showTripCard = async (tripData) => {
   var tripCard = document.getElementById("tripCardSection");
     // tripCard.scrollIntoView({ behavior: "smooth" });
     tripCard.style.display = 'block';
-    console.log(tripData.imageURL)
     document.querySelector("#destination-image").setAttribute('src', tripData.imageURL);
-
     document.getElementById('destination').textContent = `Destination: ${tripData.city}`;
     document.getElementById('tripDate').textContent = `Date: ${tripData.date}`;
     document.getElementById('daysAway').textContent = `Your trip is ${tripData.daysAway} days away.`
     document.getElementById('averageTemperature').textContent = `Average temperature: ${tripData.averageTemp}`;
     document.getElementById('weatherDescription').textContent = `Weather description: ${tripData.weatherDescription}`;
+
+    var HotelList = document.getElementById('hotel-list');
+    HotelList.innerHTML = '';
+
+    tripData.hotels.forEach(hotel => {
+      var li = document.createElement('li');
+      li.textContent = `${hotel.name} - Rating: ${hotel.rating}`;
+      HotelList.appendChild(li);
+    })
 
     var restaurantList = document.getElementById('restaurant-list');
     restaurantList.innerHTML = '';
@@ -108,9 +126,8 @@ async function handleSubmit(event) {
 
     tripData.weatherDescription = weatherData.weather.description;
 
-
     tripData.imageURL = await getImage(city)
-
+    tripData.hotels = await getHotels(city)
     tripData.restaurants = await getRestaurants(city)
 
     showTripCard(tripData)

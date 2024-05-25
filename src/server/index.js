@@ -24,7 +24,24 @@ app.get('/', function (req, res) {
     res.sendFile('dist/index.html')
 });
 
-app.get('/api/restaurants', async (req, res) => {
+app.get('/api/hotels', async (req, res) => {
+    const city = req.query.city;
+    const url = `https://api.yelp.com/v3/businesses/search?location=${city}&categories=hotels&sort_by=rating&limit=5`;
+    try {
+        const response = await axios.get(url, {
+          headers: {
+            'Authorization': 'Bearer ' + apiKey,
+          }
+        });
+
+      res.send(response.data);
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+      res.status(500).send({ error: 'An error occurred while fetching hotels' });
+    }
+  });
+
+  app.get('/api/restaurants', async (req, res) => {
     const city = req.query.city;
     const url = `https://api.yelp.com/v3/businesses/search?location=${city}&categories=restaurants&sort_by=rating&limit=5`;
     try {
