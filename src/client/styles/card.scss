@@ -12,20 +12,21 @@
     padding: 100px;
     margin-top: 20px;
     margin-bottom: 100px;
-    // background-color: #84bc63;
+    background-color: #f7f9f6;
+
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: left;
 }
 
-#cityImageContainer {
-    flex: 1; /* Take up 1/3 of the available space */
-    max-width: 60%; /* Limit image to 1/3 of the container width */
-}
+// #cityImageContainer {
+//     flex: 1; /* Take up 1/3 of the available space */
+//     max-width: 60%; /* Limit image to 1/3 of the container width */
+// }
 
-#tripDetailsContainer {
-    flex: 1; /* Take up 2/3 of the available space */
-    max-width: 40%; /* Limit details to 2/3 of the container width */
-}
+// #tripDetailsContainer {
+//     flex: 1; /* Take up 2/3 of the available space */
+//     max-width: 40%; /* Limit details to 2/3 of the container width */
+// }
 
 // #restaurant-list {
 //     // list-style-type: none;

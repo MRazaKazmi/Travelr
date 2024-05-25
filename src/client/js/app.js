@@ -1,12 +1,16 @@
-document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById("tripForm").addEventListener("submit", handleSubmit)
-})
+// API URLs
+const geonamesURL = 'http://api.geonames.org/searchJSON?q=';
+const weatherbitURL = 'https://api.weatherbit.io/v2.0/forecast/daily?';
+const pixabayURL = 'https://pixabay.com/api/?q=';
 
-const getCityData = async (city) => {
-  // fetch the data from the geonamesAPI
-  const geonamesApiURL = 'http://api.geonames.org/searchJSON?q=';
-  const geonamesApiUsername = "mohammad.r.kazmi";
-  const data = await fetch(geonamesApiURL + city + '&maxRows=5&' + 'username=' + geonamesApiUsername);
+// API Keys
+const geonamesUsername = ""
+const weatherbitKey = ''
+const pixabayKey = ''
+
+export const getCityData = async (city) => {
+  // obtain data from the geonamesAPI
+  const data = await fetch(geonamesURL + city + '&maxRows=5&' + 'username=' + geonamesUsername);
   try {
       // parse json response
       const cityData = await data.json();
@@ -17,11 +21,9 @@ const getCityData = async (city) => {
   }
 };
 
-const getWeatherData = async (cityLatitude, cityLongitude) => {
-  // fetch the data from the weatherbitAPI
-  const weatherbitApiURL = 'https://api.weatherbit.io/v2.0/forecast/daily?'
-  const weatherbitKey = '1832698fc62340c9960811091a5d29c1'
-  const res = await fetch(weatherbitApiURL + 'lat=' + cityLatitude + "&lon=" + cityLongitude + "&key=" + weatherbitKey);
+export const getWeatherData = async (cityLatitude, cityLongitude) => {
+  // obtain data from the weatherbitAPI
+  const res = await fetch(weatherbitURL + 'lat=' + cityLatitude + "&lon=" + cityLongitude + "&key=" + weatherbitKey);
   try {
       // parse json response
       const weatherData = await res.json();
@@ -31,11 +33,12 @@ const getWeatherData = async (cityLatitude, cityLongitude) => {
   }
 }
 
-const getImage = async (city) => {
-  const response = await fetch(`https://pixabay.com/api/?q=${city}&key=44028546-0d7c6f6a9bf062b356bc2a4e2`);
+export const getImage = async (city) => {
+  // obtain data from the pixabayAPI
+  const response = await fetch(`${pixabayURL}${city}&key=${pixabayKey}`);
 
   try {
-      //Transform into JSON
+      // parse json response
       const data = await response.json();
       return data.hits[0].webformatURL;
   }
@@ -43,11 +46,12 @@ const getImage = async (city) => {
       console.log('error', error);
   }}
 
-const getHotels = async (city) => {
+export const getHotels = async (city) => {
+  // obtain hotels data
   const response = await fetch(`http://localhost:8000/api/hotels?city=${city}`);
 
   try {
-    //Transform into JSON
+    // parse json response
     const data = await response.json();
     return data.businesses;
   }
@@ -55,11 +59,12 @@ const getHotels = async (city) => {
       console.log('error', error);
   }}
 
-const getRestaurants = async (city) => {
+export const getRestaurants = async (city) => {
+  // obtain restaurants data
   const response = await fetch(`http://localhost:8000/api/restaurants?city=${city}`);
 
   try {
-    //Transform into JSON
+    // parse json response
     const data = await response.json();
     return data.businesses;
   }
@@ -67,18 +72,18 @@ const getRestaurants = async (city) => {
       console.log('error', error);
   }}
 
-const showTripCard = async (tripData) => {
-  var tripCard = document.getElementById("tripCardSection");
-    // tripCard.scrollIntoView({ behavior: "smooth" });
+export const showTripCard = async (tripData) => {
+  // update UI
+  const tripCard = document.getElementById("tripCardSection");
     tripCard.style.display = 'block';
     document.querySelector("#destination-image").setAttribute('src', tripData.imageURL);
-    document.getElementById('destination').textContent = `Destination: ${tripData.city}`;
-    document.getElementById('tripDate').textContent = `Date: ${tripData.date}`;
-    document.getElementById('daysAway').textContent = `Your trip is ${tripData.daysAway} days away.`
-    document.getElementById('averageTemperature').textContent = `Average temperature: ${tripData.averageTemp}`;
-    document.getElementById('weatherDescription').textContent = `Weather description: ${tripData.weatherDescription}`;
+    document.getElementById('destination').textContent = `Destination City: ${tripData.city}`;
+    document.getElementById('tripDate').textContent = `Dates: ${tripData.departureDate} - ${tripData.returnDate}`;
+    document.getElementById('tripDays').textContent = `Your trip is ${tripData.daysAway} days away and ${tripData.tripLength} days long`
+    document.getElementById('averageTemperature').textContent = `Average temperature on first day: ${tripData.averageTemp}`;
+    document.getElementById('weatherDescription').textContent = `Weather description for first day: ${tripData.weatherDescription}`;
 
-    var HotelList = document.getElementById('hotel-list');
+    const HotelList = document.getElementById('hotel-list');
     HotelList.innerHTML = '';
 
     tripData.hotels.forEach(hotel => {
@@ -87,7 +92,7 @@ const showTripCard = async (tripData) => {
       HotelList.appendChild(li);
     })
 
-    var restaurantList = document.getElementById('restaurant-list');
+    const restaurantList = document.getElementById('restaurant-list');
     restaurantList.innerHTML = '';
 
     tripData.restaurants.forEach(restaurant => {
@@ -97,7 +102,8 @@ const showTripCard = async (tripData) => {
   })
 }
 
-function calculateDaysAway(tripDate) {
+export function calculateDaysAway(tripDate) {
+  // calculate days away
   const tripDateTime = new Date(tripDate);
   const today = new Date();
   const timeDiff = tripDateTime.getTime() - today.getTime();
@@ -105,34 +111,45 @@ function calculateDaysAway(tripDate) {
   return daysAway;
 }
 
-async function handleSubmit(event) {
+export function calculateTripLength(startDate, endDate) {
+  // calculate trip length
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const difference = end - start;
+  const daysDifference = difference / (1000 * 60 * 60 * 24);
+  return daysDifference;
+}
+
+export async function handleSubmit(event) {
     event.preventDefault();
-    let city = document.getElementById("city").value;
-    let date = document.getElementById("departure_date").value;
+    const city = document.getElementById("city").value;
+    const departureDate = document.getElementById("departure_date").value;
+    const returnDate = document.getElementById("departure_date").value;
 
-    let tripData = {}
-    tripData.city = city
-    tripData.date = date
+    let tripData = {};
 
-    tripData.daysAway = calculateDaysAway(date);
+    tripData.city = city;
+    tripData.departureDate = departureDate;
+    tripData.returnDate = returnDate;
+
+    tripData.daysAway = calculateDaysAway(departureDate);
+    tripData.tripLength = calculateTripLength(departureDate, returnDate);
 
     const { lat, lng } = await getCityData(city);
 
     const weatherData = await getWeatherData(lat, lng);
 
-    tripData.maxTemp = weatherData.max_temp;
-    tripData.minTemp = weatherData.min_temp;
-    tripData.averageTemp = ((tripData.maxTemp + tripData.minTemp)/2).toFixed(1);
+    tripData.averageTemp = ((weatherData.max_temp + weatherData.min_temp)/2).toFixed(1);
 
     tripData.weatherDescription = weatherData.weather.description;
 
-    tripData.imageURL = await getImage(city)
-    tripData.hotels = await getHotels(city)
-    tripData.restaurants = await getRestaurants(city)
+    tripData.imageURL = await getImage(city);
+    tripData.hotels = await getHotels(city);
+    tripData.restaurants = await getRestaurants(city);
 
-    showTripCard(tripData)
+    showTripCard(tripData);
     }
 
-
-export { handleSubmit };
-
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById("tripForm").addEventListener("submit", handleSubmit)
+    })

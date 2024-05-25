@@ -59,10 +59,11 @@ app.get('/api/hotels', async (req, res) => {
   });
 
 // Designates what port the app will listen to for incoming requests
-app.listen(8000, function () {
+app.listen(8000, () => {
     console.log('Example app listening on port 8000!');
 });
 
+module.exports = app;
 
 
 
