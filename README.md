@@ -1,4 +1,4 @@
-# Capstone Project - Travelr
+# Travelr
 
 ## About Project
 
